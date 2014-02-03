@@ -7,3 +7,9 @@
     <h1>Homepage - Persona Demo</h1>
 </div>
 {% endblock %}
+
+{% block js %}
+    {{ block.super }}
+
+    <script type="text/jsx" src="{{ STATIC_URL }}js/dashboard.js"></script>
+{% endblock %}

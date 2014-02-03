@@ -12,15 +12,14 @@ class LinkManager(models.Manager):
     def set_from_links(self, links, user):
         for link in links:
             link_saved = self.get_or_create(url=link['url'])
-            pub_date = datetime.datetime.fromtimestamp(int(link['date']))
-            import pdb; pdb.set_trace()
+            pub_date = datetime.datetime.utcfromtimestamp(int(link['date']))
             link_profile = LinkProfile.objects.get_or_create(
-                    user=user, link=link_saved,
-                    title=link['title'],
-                    pub_date=pub_date
+                user=user, link=link_saved[0],
+                title=link['title'],
+                pub_date=pub_date
             )
-            link_profile.tags.add(
-                    *[tag for tag in link['tags'].split(',')]
+            link_profile[0].tags.add(
+                *[tag for tag in link['tags'].split(',')]
             )
 
 

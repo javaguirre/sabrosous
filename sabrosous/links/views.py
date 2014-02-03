@@ -35,11 +35,12 @@ class LinkProfileList(mixins.ListModelMixin,
         return self.list(request, *args, **kwargs)
 
     def get_queryset(self):
-        return self.request.user.linkprofile_set.all()
+        return self.request.user.linkprofile_set.all().order_by('-pub_date')
 
     def post(self, request, *args, **kwargs):
         serializer = LinkSerializer(data=request.DATA)
         set_profile = False
+
         try:
             existing_link = Link.objects.get(url=request.DATA['url'])
         except Link.DoesNotExist:

@@ -4,33 +4,65 @@
 <head>
     <title>{% block title %}{% endblock %}</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+    <link href="{{ STATIC_URL }}vendor/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+    <link href="{{ STATIC_URL }}css/main.css" rel="stylesheet" />
     {% browserid_css %}
+
     {% block extrahead %}{% endblock %}
 </head>
 <body>
     {% browserid_info %}
     <div class="container">
-        {% if user.is_authenticated %}
-            {% browserid_logout text='Logout' %}
-        {% else %}
-            {% browserid_login text='Login' color='dark' %}
-        {% endif %}
-
-        {% if messages %}
-        <div>
-            {% for message in messages %}
-                {% autoescape off %}
-                    {{ message|safe }}
-                {% endautoescape %}
-            {% endfor %}
+        <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">Project name</a>
+                </div>
+                <div class="navbar-collapse collapse">
+                    {% if user.is_authenticated %}
+                        {% browserid_logout text='Logout' %}
+                    {% else %}
+                        {% browserid_login text='Login' color='dark' %}
+                    {% endif %}
+                </div><!--/.navbar-collapse -->
+            </div>
         </div>
-        {% endif %}
 
-        {% block content %}{% endblock %}
-        {% block sidebar %}{% endblock %}
+        <div class="container">
+            {% if messages %}
+            <div>
+                {% for message in messages %}
+                    {% autoescape off %}
+                        {{ message|safe }}
+                    {% endautoescape %}
+                {% endfor %}
+            </div>
+            {% endif %}
 
-        <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-        {% browserid_js %}
+            <div class="row">
+                {% block content %}{% endblock %}
+            </div>
+
+            <hr>
+
+            <footer></footer>
+        </div> <!-- /container -->
+
+        {% block js %}
+            <script type="text/javascript" src="{{ STATIC_URL }}vendor/jquery/jquery.js"></script>
+            <script type="text/javascript" src="{{ STATIC_URL }}vendor/react/react.js"></script>
+            <script type="text/javascript" src="{{ STATIC_URL }}vendor/jquery-cookie/jquery.cookie.js"></script>
+            <script type="text/javascript"
+                    src="{{ STATIC_URL }}vendor/react/JSXTransformer.js"></script>
+            {% browserid_js %}
+        {% endblock %}
     </div>
 </body>
 </html>

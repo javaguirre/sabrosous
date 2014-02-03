@@ -1,0 +1,5 @@
+*.pyc
+*.sw[op]
+sabrosous_db
+vendor/
+settings_local.py

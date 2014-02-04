@@ -1,23 +1,48 @@
 /** @jsx React.DOM */
 var Link = React.createClass({
     render: function() {
+        var pub_date = moment(this.props.pub_date).calendar();
+        var domain = parseUri(this.props.url).host;
+
         return (
-            <li>{this.props.title}</li>
+            <div className="row link-block well">
+                <div>
+                    <a href={this.props.url} className="link-title">{this.props.title}</a>
+                    <a href={domain} className="link-title">{domain}</a>
+                </div>
+                <div>
+                    {this.props.tags} <span className="pull-right">{pub_date}</span>
+                </div>
+            </div>
         )
     }
 });
 
+var Tag = React.createClass({
+    render: function() {
+        var hash = '#' + this.props.slug;
+
+        return (
+            <a href={hash} className="tag small">{this.props.name}</a>
+        )
+    }
+})
+
 var LinkList = React.createClass({
     render: function() {
         var links = this.props.data.map(function(link) {
-            return <Link url={link.url} title={link.title} key={link.id} />;
+            var tags = link.tags.map(function(tag) {
+                return <Tag slug={tag.slug} name={tag.name} />;
+            });
+
+            return <Link url={link.url} title={link.title} key={link.id}
+                         tags={tags} pub_date={link.pub_date}
+                         />;
         });
 
         return (
-            <div>
-                <ul>
-                    {links}
-                </ul>
+            <div className="link-list">
+                {links}
             </div>
         )
     }

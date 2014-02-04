@@ -27,6 +27,8 @@
                 </div>
                 <div class="navbar-collapse collapse">
                     {% if user.is_authenticated %}
+                        <input type="search" placeholder="Search" />
+
                         {% browserid_logout text='Logout' %}
                     {% else %}
                         {% browserid_login text='Login' color='dark' %}
@@ -59,8 +61,10 @@
             <script type="text/javascript" src="{{ STATIC_URL }}vendor/jquery/jquery.js"></script>
             <script type="text/javascript" src="{{ STATIC_URL }}vendor/react/react.js"></script>
             <script type="text/javascript" src="{{ STATIC_URL }}vendor/jquery-cookie/jquery.cookie.js"></script>
+            <script type="text/javascript" src="{{ STATIC_URL }}vendor/momentjs/moment.js"></script>
             <script type="text/javascript"
                     src="{{ STATIC_URL }}vendor/react/JSXTransformer.js"></script>
+            <script type="text/javascript" src="{{ STATIC_URL }}js/parseuri.js"></script>
             {% browserid_js %}
         {% endblock %}
     </div>

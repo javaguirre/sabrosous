@@ -2,3 +2,22 @@ body {
   padding-top: 50px;
   padding-bottom: 20px;
 }
+
+.tag {
+    padding-right: 5px;
+}
+
+.link-title {
+    padding-right: 10px;
+}
+
+.link-list {
+    padding-top: 20px;
+}
+
+.well {
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    background-color: #ecf0f1;
+}

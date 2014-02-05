@@ -48,11 +48,14 @@ var Link = React.createClass({
 });
 
 var Tag = React.createClass({
+    onTagClick: function() {
+        this.props.handleTag(this.props.slug);
+    },
     render: function() {
         var hash = '#' + this.props.slug;
 
         return (
-            <a href={hash} className="tag small">{this.props.name}</a>
+            <a href={hash} className="tag small" onClick={this.onTagClick}>{this.props.name}</a>
         )
     }
 });
@@ -93,9 +96,12 @@ var LinkForm = React.createClass({
 var LinkList = React.createClass({
     render: function() {
         var onDelete = this.props.onDelete;
+        var handleTag = this.props.handleTag;
+
         var links = this.props.data.map(function(link) {
             var tags = link.tags.map(function(tag) {
-                return <Tag slug={tag.slug} name={tag.name} key={tag.id} />;
+                return <Tag slug={tag.slug} name={tag.name} key={tag.id}
+                            handleTag={handleTag} />;
             });
 
             return <Link url={link.url} title={link.title} key={link.id}
@@ -218,6 +224,9 @@ var LinkBox = React.createClass({
     searchLinks: function(query) {
         this.loadLinksFromServer(query);
     },
+    clickTag: function(tag) {
+        this.searchLinks('#' + tag);
+    },
     getInitialState: function() {
         return {data: []};
     },
@@ -234,7 +243,8 @@ var LinkBox = React.createClass({
 
                 <LinkSearch handleSearch={this.searchLinks} />
 
-                <LinkList data={this.state.data} onDelete={this.deleteObj} />
+                <LinkList data={this.state.data} onDelete={this.deleteObj}
+                          handleTag={this.clickTag} />
             </div>
         )
     }

@@ -21,7 +21,7 @@ var Link = React.createClass({
                 <div className="col-md-11">
                     <div>
                         <a href={this.props.url} className="link-title">
-                            <span ref="title">{this.props.title}</span>
+                            <span>{this.props.title}</span>
                         </a>
                         <a href={domain_url} className="link-title">{domain}</a>
                     </div>
@@ -31,6 +31,9 @@ var Link = React.createClass({
                 </div>
                 <div className="col-md-1">
                     <div>
+                        <a href="#edit" onClick={this.saveObj}>
+                            <span className="glyphicon glyphicon-hdd"></span>
+                        </a>
                         <a href="#edit" onClick={this.editObj}>
                             <span className="glyphicon glyphicon-pencil edit-obj"></span>
                         </a>

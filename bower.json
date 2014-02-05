@@ -6,6 +6,7 @@
     "bootstrap": "~3.1.0",
     "jquery-cookie": "~1.4.0",
     "react": "~0.8.0",
-    "momentjs": "~2.5.1"
+    "momentjs": "~2.5.1",
+    "bootstrap-tagsinput": "~0.3.9"
   }
 }

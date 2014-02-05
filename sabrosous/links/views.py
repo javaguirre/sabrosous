@@ -12,7 +12,7 @@ from rest_framework import permissions
 
 from links.serializers import LinkSerializer, LinkProfileSerializer
 from links.models import Link, LinkProfile
-from links.utils import import_links
+from links.utils import import_links, handle_query
 
 
 class LinkIndex(TemplateView):
@@ -35,7 +35,14 @@ class LinkProfileList(mixins.ListModelMixin,
         return self.list(request, *args, **kwargs)
 
     def get_queryset(self):
-        return self.request.user.linkprofile_set.all().order_by('-pub_date')
+        query = self.request.GET.get('query', None)
+
+        if not query:
+            queryset = self.request.user.linkprofile_set.all()
+        else:
+            queryset = self.request.user.linkprofile_set.filter(handle_query(query))
+
+        return queryset.distinct().order_by('-pub_date')
 
     def post(self, request, *args, **kwargs):
         serializer = LinkSerializer(data=request.DATA)

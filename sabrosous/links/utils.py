@@ -1,8 +1,12 @@
 import re
+import operator
+from functools import reduce
+from collections import defaultdict
 
 from lxml import html
 import requests
 from requests.exceptions import ConnectionError
+from django.db.models import Q
 
 
 def is_local_url(url):
@@ -70,3 +74,28 @@ def import_links(import_file, user):
     links = parse_delicious(content)
 
     return links
+
+
+def handle_query(query):
+    query_tokens = defaultdict(list)
+    query_result = None
+    tokens = query.split(' ')
+
+    for token in tokens:
+        if token.startswith('#'):
+            query_tokens['tags'].append(token[1:])
+        else:
+            query_tokens['titles'].append(token)
+
+    if query_tokens['titles']:
+        query_tokens['titles'] = reduce(operator.and_, (Q(title__icontains=x) for x in query_tokens['titles']))
+        query_result = query_tokens['titles']
+    if query_tokens['tags']:
+        query_tokens['tags'] = Q(tags__slug__in=query_tokens['tags'])
+
+        if query_result:
+            query_result &= query_tokens['tags']
+        else:
+            query_result = query_tokens['tags']
+
+    return query_result

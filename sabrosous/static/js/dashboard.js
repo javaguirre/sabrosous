@@ -1,5 +1,8 @@
 /** @jsx React.DOM */
 var Link = React.createClass({
+    getInitialState: function() {
+        return {edit: 'none'};
+    },
     deleteObj: function() {
         this.props.onDelete(this.props.key);
     },
@@ -17,7 +20,9 @@ var Link = React.createClass({
                  className="row link-block well">
                 <div className="col-md-11">
                     <div>
-                        <a href={this.props.url} className="link-title">{this.props.title}</a>
+                        <a href={this.props.url} className="link-title">
+                            <span ref="title">{this.props.title}</span>
+                        </a>
                         <a href={domain_url} className="link-title">{domain}</a>
                     </div>
                     <div>
@@ -150,6 +155,21 @@ var LinkImport = React.createClass({
     }
 });
 
+var LinkSearch = React.createClass({
+    onSearch: function() {
+        var query = this.refs.query.getDOMNode().value.trim();
+        this.props.handleSearch(query);
+    },
+    render: function() {
+        return (
+            <div>
+                <input type="search" placeholder="Search" ref="query" />
+                <input type="button" value="Search" onClick={this.onSearch}/>
+            </div>
+        );
+    }
+});
+
 var LinkBox = React.createClass({
     handleAddLink: function(url) {
         var links = this.state.data;
@@ -182,27 +202,18 @@ var LinkBox = React.createClass({
             headers: {'X-CSRFToken': $.cookie('csrftoken')}
         });
     },
-    search: function(query) {
-        if(query === "") {
-            return this;
-        }
-
-        var pattern = new RegExp(query, 'gi');
-        objs = _(this.filter(function(data) {
-            return pattern.test(data.get('title'));
-        }));
-
-        return objs;
-    },
-
-    loadLinksFromServer: function() {
+    loadLinksFromServer: function(query) {
         $.ajax({
             url: this.props.url,
             dataType: 'json',
+            data: {query: query},
             success: function(data) {
               this.setState({data: data});
             }.bind(this)
         });
+    },
+    searchLinks: function(query) {
+        this.loadLinksFromServer(query);
     },
     getInitialState: function() {
         return {data: []};
@@ -217,6 +228,8 @@ var LinkBox = React.createClass({
                 <LinkImport />
 
                 <LinkForm url={this.props.url} onSubmit={this.handleAddLink} />
+
+                <LinkSearch handleSearch={this.searchLinks} />
 
                 <LinkList data={this.state.data} onDelete={this.deleteObj} />
             </div>

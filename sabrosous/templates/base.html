@@ -28,8 +28,6 @@
                 </div>
                 <div class="navbar-collapse collapse">
                     {% if user.is_authenticated %}
-                        <input type="search" placeholder="Search" />
-
                         {% browserid_logout text='Logout' %}
                     {% else %}
                         {% browserid_login text='Login' color='dark' %}

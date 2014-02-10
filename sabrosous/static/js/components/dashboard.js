@@ -6,8 +6,61 @@ var Link = React.createClass({
     deleteObj: function() {
         this.props.onDelete(this.props.key);
     },
+    toggleEdit: function(elem) {
+        if(elem.contentEditable == "true") {
+            elem.contentEditable = false;
+            elem.className.replace(' editing', '');
+        }
+        else {
+            elem.contentEditable = true;
+            elem.className += ' editing';
+        }
+    },
     editObj: function() {
-        console.log('edit');
+        var title_elem = this.refs.title.getDOMNode();
+        var tags_elem = this.refs.tags.getDOMNode();
+
+        this.toggleEdit(title_elem);
+        this.toggleEdit(tags_elem);
+
+        $(tags_elem).tagsinput({
+            itemValue: function(item) {
+                return item.props.slug;
+            },
+            itemText: function(item) {
+                return item.props.name;
+            }
+        });
+
+        this.props.tags.forEach(function(tag) {
+            $(tags_elem).tagsinput('add', tag);
+        });
+    },
+    saveObj: function() {
+        var tags_elem = this.refs.tags.getDOMNode();
+        var title_elem = this.refs.title.getDOMNode();
+        var title = title_elem.textContent.trim();
+        var tags = $(tags_elem).val();
+        var data_id = this.props.key;
+
+        this.toggleEdit(title_elem);
+        this.toggleEdit(tags_elem);
+        $(tags_elem).tagsinput('destroy');
+
+        //TODO process tags
+
+        data = {
+            tags: tags,
+            title: title
+        }
+
+        $.ajax({
+            type: 'PATCH',
+            url: '/api/links/' + data_id + '/',
+            data: data,
+            headers: {'X-CSRFToken': $.cookie('csrftoken')},
+            success: function(data) {}.bind(this)
+        });
     },
     render: function() {
         var pub_date = moment(this.props.pub_date).calendar();
@@ -20,13 +73,15 @@ var Link = React.createClass({
                  className="row link-block well">
                 <div className="col-md-11">
                     <div>
-                        <a href={this.props.url} className="link-title">
-                            <span>{this.props.title}</span>
+                        <a href={this.props.url} className="link-title"
+                           ref="title">
+                            {this.props.title}
                         </a>
                         <a href={domain_url} className="link-title">{domain}</a>
                     </div>
+
                     <div>
-                        {this.props.tags} <span className="pull-right">{pub_date}</span>
+                        <span ref="tags">{this.props.tags}</span> <span className="pull-right">{pub_date}</span>
                     </div>
                 </div>
                 <div className="col-md-1">
@@ -64,6 +119,9 @@ var LinkForm = React.createClass({
     getInitialState: function() {
         return {add: 'none'};
     },
+    componentDidMount: function() {
+        $('input[name="tags"]').tagsinput();
+    },
     toggleAdd: function() {
         var add = 'none';
 
@@ -86,6 +144,8 @@ var LinkForm = React.createClass({
 
                 <div style={{display: this.state.add}}>
                     <input type="text" ref="url" />
+                    <input type="text" name="title" ref="title" />
+                    <input type="text" name="tags" ref="tags" />
                     <input type="button" onClick={this.addObj} value="add" />
                 </div>
             </div>
@@ -181,18 +241,17 @@ var LinkSearch = React.createClass({
 
 var LinkBox = React.createClass({
     handleAddLink: function(url) {
-        var links = this.state.data;
-
-        data = {url: url};
+        link = {url: url};
 
         $.ajax({
             type: 'POST',
             url: this.props.url,
-            data: data,
+            data: link,
             headers: {'X-CSRFToken': $.cookie('csrftoken')},
             success: function(data) {
-                var newLinks = links.concat([data]);
-                this.setState(newLinks);
+                var links = this.state.data;
+                var newLinks = [data].concat(links);
+                this.setState({data: newLinks});
             }.bind(this)
         });
     },

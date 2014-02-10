@@ -7,3 +7,4 @@ Fabric==1.8.1
 lxml==3.3.0
 gunicorn==18.0
 raven==4.0.4
+djangorestframework==2.3.12

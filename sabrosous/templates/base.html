@@ -16,46 +16,25 @@
 <body>
     {% browserid_info %}
     <div class="container">
-        <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-            <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="#">Sabrosous</a>
-                </div>
-                <div class="navbar-collapse collapse">
-                    {% if user.is_authenticated %}
-                        {% browserid_logout text='Logout' %}
-                    {% else %}
-                        {% browserid_login text='Login' color='dark' %}
-                    {% endif %}
-                </div><!--/.navbar-collapse -->
-            </div>
+        {% block header %}{% endblock %}
+
+        {% if messages %}
+        <div>
+            {% for message in messages %}
+                {% autoescape off %}
+                    {{ message|safe }}
+                {% endautoescape %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="row">
+            {% block content %}{% endblock %}
         </div>
 
-        <div class="container">
-            {% if messages %}
-            <div>
-                {% for message in messages %}
-                    {% autoescape off %}
-                        {{ message|safe }}
-                    {% endautoescape %}
-                {% endfor %}
-            </div>
-            {% endif %}
-
-            <div class="row">
-                {% block content %}{% endblock %}
-            </div>
-
-            <hr>
-
-            <footer></footer>
-        </div> <!-- /container -->
+        <footer>
+            <strong>Sabrosous</strong> is <a href="https://github.com/javaguirre/sabrosous">Free Software</a>
+        </footer>
 
         {% block js %}
             <script type="text/javascript" src="{{ STATIC_URL }}vendor/jquery/jquery.js"></script>

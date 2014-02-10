@@ -1,9 +1,29 @@
 {% extends "base.html" %}
+{% load browserid %}
 
 {% block title %}Homepage{% endblock %}
 
 {% block content %}
-<div id="content">
-    <h1>Homepage - Persona Demo</h1>
-</div>
+    <div class="row">
+        <div class="col-md-12">
+            <img src="{{ STATIC_URL }}img/logo.png" class="img-responsive main-logo" />
+            <h4 class="slogan">Save and organize your links</h4>
+        </div>
+    </div>
+
+    <div class="vertical-container">
+        <div class="row well">
+            <div class="col-md-8">
+                <img src="{{ STATIC_URL }}img/screenshot.png" style="width: 800px"/>
+            </div>
+
+            <div class="col-md-4">
+                {% if user.is_authenticated %}
+                    {% browserid_logout text='Logout' %}
+                {% else %}
+                    {% browserid_login text='Login' color='dark' %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
 {% endblock %}

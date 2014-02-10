@@ -35,6 +35,7 @@ class LinkProfileList(mixins.ListModelMixin,
         return self.list(request, *args, **kwargs)
 
     def get_queryset(self):
+        LIMIT = 20
         query = self.request.GET.get('query', None)
 
         if not query:
@@ -42,7 +43,7 @@ class LinkProfileList(mixins.ListModelMixin,
         else:
             queryset = self.request.user.linkprofile_set.filter(handle_query(query))
 
-        return queryset.distinct().order_by('-pub_date')
+        return queryset.distinct().order_by('-pub_date')[:LIMIT]
 
     def post(self, request, *args, **kwargs):
         serializer = LinkSerializer(data=request.DATA)

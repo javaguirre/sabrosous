@@ -1,6 +1,7 @@
 body {
   padding-top: 50px;
   padding-bottom: 20px;
+  background-color: #F5F5DC;
 }
 
 .tag {
@@ -19,5 +20,34 @@ body {
     border-radius: 0;
     box-shadow: none;
     border: none;
-    background-color: #ecf0f1;
+    background-color: white;
+}
+
+.editing {
+    color: #a42609 !important;
+}
+
+.main-logo {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.slogan {
+    text-align: center;
+}
+
+footer {
+    text-align: center;
+}
+
+.vertical-container .row {
+    display: table;
+    width: 100%;
+}
+
+.vertical-container .row > .col-md-4 {
+    display: table-cell;
+    float: none;
+    vertical-align: middle;
 }

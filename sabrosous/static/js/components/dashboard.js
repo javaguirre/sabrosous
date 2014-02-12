@@ -1,10 +1,11 @@
 /** @jsx React.DOM */
 var Link = React.createClass({
     getInitialState: function() {
-        return {edit: 'none'};
+        return {data: this.props.data,
+                edit: 'none'};
     },
     deleteObj: function() {
-        this.props.onDelete(this.props.key);
+        this.props.onDelete(this.state.data.key);
     },
     toggleEdit: function(elem) {
         if(elem.contentEditable == "true") {
@@ -23,31 +24,21 @@ var Link = React.createClass({
         this.toggleEdit(title_elem);
         this.toggleEdit(tags_elem);
 
-        $(tags_elem).tagsinput({
-            itemValue: function(item) {
-                return item.props.slug;
-            },
-            itemText: function(item) {
-                return item.props.name;
-            }
-        });
+        $(tags_elem).tagsinput();
 
-        this.props.tags.forEach(function(tag) {
-            $(tags_elem).tagsinput('add', tag);
+        this.state.data.tags.forEach(function(tag) {
+            $(tags_elem).tagsinput('add', tag.state.data.slug);
         });
     },
     saveObj: function() {
         var tags_elem = this.refs.tags.getDOMNode();
         var title_elem = this.refs.title.getDOMNode();
         var title = title_elem.textContent.trim();
-        var tags = $(tags_elem).val();
-        var data_id = this.props.key;
+        var tags = $(tags_elem).tagsinput('items');
 
         this.toggleEdit(title_elem);
         this.toggleEdit(tags_elem);
         $(tags_elem).tagsinput('destroy');
-
-        //TODO process tags
 
         data = {
             tags: tags,
@@ -56,32 +47,41 @@ var Link = React.createClass({
 
         $.ajax({
             type: 'PATCH',
-            url: '/api/links/' + data_id + '/',
+            url: '/api/links/' + this.state.data.id + '/',
             data: data,
             headers: {'X-CSRFToken': $.cookie('csrftoken')},
-            success: function(data) {}.bind(this)
+            success: function(result) {
+                var handleTag = function() {};
+                var tags = result.tags.map(function(tag) {
+                    return <Tag data={tag}
+                                handleTag={handleTag} />;
+                });
+                result.tags = tags;
+
+                this.setState({data: result});
+            }.bind(this)
         });
     },
     render: function() {
-        var pub_date = moment(this.props.pub_date).calendar();
-        var uri_obj = parseUri(this.props.url);
+        var pub_date = moment(this.state.data.pub_date).calendar();
+        var uri_obj = parseUri(this.state.data.url);
         var domain = uri_obj.host;
         var domain_url = uri_obj.protocol + '://' + domain;
 
         return (
-            <div ref="item" data-id={this.props.id}
+            <div ref="item" data-id={this.state.data.id}
                  className="row link-block well">
                 <div className="col-md-11">
                     <div>
-                        <a href={this.props.url} className="link-title"
+                        <a href={this.state.data.url} className="link-title"
                            ref="title">
-                            {this.props.title}
+                            {this.state.data.title}
                         </a>
                         <a href={domain_url} className="link-title">{domain}</a>
                     </div>
 
                     <div>
-                        <span ref="tags">{this.props.tags}</span> <span className="pull-right">{pub_date}</span>
+                        <span ref="tags">{this.state.data.tags}</span> <span className="pull-right">{pub_date}</span>
                     </div>
                 </div>
                 <div className="col-md-1">
@@ -103,14 +103,17 @@ var Link = React.createClass({
 });
 
 var Tag = React.createClass({
+    getInitialState: function() {
+        return {data: this.props.data};
+    },
     onTagClick: function() {
-        this.props.handleTag(this.props.slug);
+        this.props.handleTag(this.state.data.slug);
     },
     render: function() {
-        var hash = '#' + this.props.slug;
+        var hash = '#' + this.state.data.slug;
 
         return (
-            <a href={hash} className="tag small" onClick={this.onTagClick}>{this.props.name}</a>
+            <a href={hash} className="tag small" onClick={this.onTagClick}>{this.state.data.name}</a>
         )
     }
 });
@@ -145,7 +148,7 @@ var LinkForm = React.createClass({
                 <div style={{display: this.state.add}}>
                     <input type="text" ref="url" />
                     <input type="text" name="title" ref="title" />
-                    <input type="text" name="tags" ref="tags" />
+                    <input type="text" name="tags" ref="tags" data-role="tagsinput" />
                     <input type="button" onClick={this.addObj} value="add" />
                 </div>
             </div>
@@ -160,12 +163,14 @@ var LinkList = React.createClass({
 
         var links = this.props.data.map(function(link) {
             var tags = link.tags.map(function(tag) {
-                return <Tag slug={tag.slug} name={tag.name} key={tag.id}
+                return <Tag data={tag}
                             handleTag={handleTag} />;
             });
 
-            return <Link url={link.url} title={link.title} key={link.id}
-                         tags={tags} pub_date={link.pub_date}
+            data = link;
+            data.tags = tags;
+
+            return <Link data={data}
                          onDelete={onDelete}
                          />;
         });

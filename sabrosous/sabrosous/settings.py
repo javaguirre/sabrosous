@@ -117,3 +117,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(os.path.dirname(__file__), '../static'),
 )
+
+try:
+    from settings_local import *
+except ImportError:
+    pass

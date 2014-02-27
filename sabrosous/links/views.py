@@ -1,9 +1,6 @@
 import json
 
-from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
-from django.template import RequestContext
 from django.views.generic.base import TemplateView
 from django.http import HttpResponse
 from rest_framework import generics, mixins, status
@@ -15,14 +12,23 @@ from links.models import Link, LinkProfile
 from links.utils import import_links, handle_query
 
 
-class LinkIndex(TemplateView):
+class LinkSave(TemplateView):
     def get(self, request):
-        return render_to_response('links/index.html',
-                                  context_instance=RequestContext(request))
+        context = {}
+        url = request.GET.get('url', None)
 
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        return super(LinkIndex, self).dispatch(*args, **kwargs)
+        if not url:
+            message = 'You need to add an url'
+        else:
+            message = 'Url saved'
+
+        # TODO save url
+        context['message'] = message
+
+        return render_to_response(
+            'save.html',
+            context
+        )
 
 
 class LinkProfileList(mixins.ListModelMixin,

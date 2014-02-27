@@ -59,6 +59,7 @@ INSTALLED_APPS = (
     'south',
     'taggit',
     'rest_framework',
+    'raven.contrib.django.raven_compat',
 
     # apps
     'links'

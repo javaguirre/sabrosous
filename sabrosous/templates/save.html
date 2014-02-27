@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load browserid %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block content %}
+    <div id="content">
+        {{ message }}
+    </div>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+
+    <script type="text/javascript" charset="utf-8">
+        $(function() {
+            $('input[tags="tags"]').tagsinput();
+        });
+    </script>
+{% endblock %}

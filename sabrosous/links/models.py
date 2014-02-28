@@ -9,6 +9,26 @@ import utils
 
 
 class LinkManager(models.Manager):
+    def save_link(self, serializer, url, user):
+        existing_link = None
+        link_obj = None
+        linkprofile = None
+
+        try:
+            existing_link = Link.objects.get(url=url)
+        except Link.DoesNotExist:
+            pass
+
+        if not existing_link and serializer.is_valid():
+            link_obj = serializer.save()
+        elif existing_link:
+            link_obj = existing_link
+
+        if link_obj:
+            linkprofile = link_obj.set_linkprofile(user)
+
+        return linkprofile
+
     def set_from_links(self, links, user):
         for link in links:
             link_saved = self.get_or_create(url=link['url'])

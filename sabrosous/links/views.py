@@ -1,8 +1,9 @@
 import json
 
-from django.shortcuts import render_to_response
+from django.shortcuts import redirect
 from django.views.generic.base import TemplateView
 from django.http import HttpResponse
+from django.contrib import messages
 from rest_framework import generics, mixins, status
 from rest_framework.response import Response
 from rest_framework import permissions
@@ -14,21 +15,19 @@ from links.utils import import_links, handle_query
 
 class LinkSave(TemplateView):
     def get(self, request):
-        context = {}
         url = request.GET.get('url', None)
+        serializer = LinkSerializer(data=request.GET)
+        linkprofile = Link.objects.save_link(serializer, url,
+                                             request.user)
 
-        if not url:
+        if not linkprofile:
             message = 'You need to add an url'
+            messages.error(request, message)
         else:
             message = 'Url saved'
+            messages.info(request, message)
 
-        # TODO save url
-        context['message'] = message
-
-        return render_to_response(
-            'save.html',
-            context
-        )
+        return redirect('home')
 
 
 class LinkProfileList(mixins.ListModelMixin,
@@ -53,26 +52,13 @@ class LinkProfileList(mixins.ListModelMixin,
 
     def post(self, request, *args, **kwargs):
         serializer = LinkSerializer(data=request.DATA)
-        set_profile = False
+        linkprofile = Link.objects.save_link(serializer, request.DATA['url'],
+                                             request.user)
 
-        try:
-            existing_link = Link.objects.get(url=request.DATA['url'])
-        except Link.DoesNotExist:
-            existing_link = None
+        if linkprofile:
+            return Response(LinkProfileSerializer(linkprofile).data,
+                            status=status.HTTP_201_CREATED)
 
-        if not existing_link and serializer.is_valid():
-            obj = serializer.save()
-            obj.save()
-            set_profile = True
-        elif existing_link:
-            obj = existing_link
-            set_profile = True
-
-        if set_profile:
-            linkprofile = obj.set_linkprofile(request.user)
-            if linkprofile:
-                return Response(LinkProfileSerializer(linkprofile).data,
-                                status=status.HTTP_201_CREATED)
         return Response(serializer.errors,
                         status=status.HTTP_400_BAD_REQUEST)
 

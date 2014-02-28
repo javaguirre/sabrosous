@@ -19,7 +19,7 @@
         {% block header %}{% endblock %}
 
         {% if messages %}
-        <div>
+        <div class="alert alert-info">
             {% for message in messages %}
                 {% autoescape off %}
                     {{ message|safe }}

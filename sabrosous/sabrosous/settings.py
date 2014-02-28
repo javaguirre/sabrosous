@@ -28,6 +28,8 @@ ALLOWED_HOSTS = ['sabrosous.net']
 
 SITE_URL = 'http://localhost:8000'
 
+LOGIN_URL = '/'
+
 #Persona
 LOGIN_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL_FAILURE = '/'
